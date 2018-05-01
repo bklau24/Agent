@@ -3,95 +3,47 @@ package agent;
 import java.util.*;
 
 public class AgentMain {
+
     public static void main(String[] args) throws Exception {
-		
-        //int t1 = 5000;
-	//int t2 = 8000;
-        //Random rand = new Random();
                 
-        List<Agent> agents = new LinkedList<>();
+        List<AgentThread> agents = new LinkedList<>();
         String filename;
+        final int t1 = 5000;
+        final int t2 = 8000;
         
 	System.out.println("Az elso ugynokseg ugynokeinek szama: ");
 	Scanner sc = new Scanner(System.in);
         int n = sc.nextInt();
-            if ( n > 10){
-		System.out.println("Az ugynokok szama max 10 lehet.");
-		return; //javítani kell rajta
+            while ( n > 10){
+		System.out.println("Az ugynokok szama max 10 lehet. Adjon meg új számot!");
+		sc = new Scanner(System.in);
+                n = sc.nextInt();
             }
 		
 	System.out.println("A masodik ugynokseg ugynokeinek szama: ");
 	int m = sc.nextInt();
-            if ( m > 10){
-		System.out.println("Az ugynokok szama max 10 lehet.");
-		return;
+            while ( m > 10){
+		System.out.println("Az ugynokok szama max 10 lehet. Adjon meg új számot!");
+		sc = new Scanner(System.in);
+                m = sc.nextInt();
             }
                 
-        for(int i = 1; i <= n; i++){
+        for(int i = 1; i <= n; i++){        //az első ügynökség ügynökeinek létrehozása (szálak)
             filename = "agent1-" + i + ".txt";
-            Agent agent = new Agent(1, i, filename);
-            System.out.println(agent.getSecret());
-            System.out.println(agent.getNames());
+            AgentThread agent = new AgentThread(1, i, filename, t1, t2);
+            agent.start();
             agents.add(agent);
         }
         
-        for(int i = 1; i <= m; i++){
+        for(int i = 1; i <= m; i++){        //a második ügynökség ügynökeinek létrehozása (szálak)
             filename = "agent2-" + i + ".txt";
-            Agent agent = new Agent(2, i, filename);
+            AgentThread agent = new AgentThread(2, i, filename, t1, t2);
+            agent.start();
             agents.add(agent);
         }
-                
-               
-	/*
-            for(int i = 0; i < n; i++ ){
-                int t = rand.nextInt((t2 - t1) + 1) + t1;
-                new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        System.out.println("Elso ugynok");
-			int port = rand.nextInt(20100 + (20000 - 20100) + 1);
-			int tmp = rand.nextInt(20100 + (20000 - 20100) + 1);
-			while (port == tmp){
-                            tmp = rand.nextInt(20100 + (20000 - 20100) + 1);
-                        }
-			int port2 = tmp;
-                        Szerver.main(new String[] {Integer.toString(port2)});
-                        Kliens.main(new String[] {Integer.toString(port)});
-                        
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (Exception ex) {
-                        Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                }.start();
-                Thread.sleep(t);
-            }
-            
-            for(int i = 0; i < m; i++ ){
-                int t = rand.nextInt((t2 - t1) + 1) + t1;
-                new Thread() {
-                @Override
-                public void run() {
-                    try {
-                       System.out.println("Masodik ugynok");
-			int port = rand.nextInt(20100 + (20000 - 20100) + 1);
-			int tmp = rand.nextInt(20100 + (20000 - 20100) + 1);
-			while (port == tmp){
-                            tmp = rand.nextInt(20100 + (20000 - 20100) + 1);
-                        }
-			int port2 = tmp;
-                        Szerver.main(new String[] {Integer.toString(port2)});
-                        Kliens.main(new String[] {Integer.toString(port)});
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (Exception ex) {
-                        Logger.getLogger(Agent.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                }.start();
-                Thread.sleep(t);
-            }*/
+        
+        for(AgentThread agent : agents){
+            agent.join();
+        }
     }	
 }
