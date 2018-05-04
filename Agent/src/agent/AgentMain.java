@@ -44,6 +44,6 @@ public class AgentMain {
         
         for(AgentThread agent : agents){
             agent.join();
-        }
+        } 
     }	
 }

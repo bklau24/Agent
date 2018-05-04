@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 public class AgentThread extends Thread {
     
-    protected final int team;
+    private final int team;
     private final int number;
     private final List<String> names = new LinkedList<>();
     private String secretWord;
@@ -24,17 +24,46 @@ public class AgentThread extends Thread {
     
     
     
-    public AgentThread(int n, int nb, String fname, int min, int max) throws FileNotFoundException{
+    public AgentThread(int n, int nb, String fname, int min, int max) throws FileNotFoundException, InterruptedException{
         this.filename = fname;
         this.team = n;
         this.number = nb;
         this.t1 = min;
         this.t2 = max;
         this.t = rand.nextInt((t2 - t1) +1) + t1;
-        readData();
         int port = rand.nextInt((20100 - 20000) +1) + 20000;
-        Kliens k = new Kliens(this);
+        readData();
+        
         Szerver sz = new Szerver(this);
+
+            Thread server = new Thread(this) {
+                @Override
+                public void run() {
+                    try {
+                        //int port = rand.nextInt((20100 - 20000) +1) + 20000;
+                        Szerver.main(new String[] {Integer.toString(port), Integer.toString(t1), Integer.toString(t2)});
+                    } catch (Exception ex) {}
+                }
+            };
+            
+        Kliens k = new Kliens(this);
+            
+            Thread client = new Thread(this){
+                @Override
+                public void run() {
+                    try {
+                        int port2 = rand.nextInt((20100 - 20000) +1) + 20000;
+                        while(port2 == port){
+                            port2 = rand.nextInt((20100 - 20000) +1) + 20000;
+                        }
+                        Kliens.main(new String[] {Integer.toString(port2), Integer.toString(t1), Integer.toString(t2)});
+                    } catch (Exception ex) {}
+                }
+            };
+        
+            server.start();
+            client.start();
+        
     }
     
     private void readData() throws FileNotFoundException {
@@ -74,6 +103,7 @@ public class AgentThread extends Thread {
         return this.number;
     }
     
+    /*
     @Override
     public void run() {
         
@@ -82,6 +112,7 @@ public class AgentThread extends Thread {
                 @Override
                 public void run() {
                     try {
+                        Kliens k = new Kliens();
                         int port = rand.nextInt((20100 - 20000) +1) + 20000;
                         Szerver.main(new String[] {Integer.toString(port), Integer.toString(t1), Integer.toString(t2)});
                     } catch (Exception ex) {}
@@ -100,5 +131,5 @@ public class AgentThread extends Thread {
             Thread.sleep(t);
         } catch (InterruptedException ex) {}
         
-    } 
+    } */
 }
